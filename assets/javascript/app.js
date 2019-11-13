@@ -3,7 +3,7 @@ window.onload = function () {
 
     $(document).on("click", "#topicBtn", showImages)
         .on("click", ".gif", animateImages)
-
+        .on("click", "#btnSubmit", addTopic);
 };
 
 var topicsArr = ["captain planet", "disney", "finding nemo",
@@ -66,5 +66,12 @@ function animateImages() {
     }
 };
 
+function addTopic() {
+    event.preventDefault();
 
+    var cartoonName = $("#cartoonNameId").val();
+    if (!topicsArr.includes(cartoonName)) topicsArr.push(cartoonName);
+
+    showTopicButtons();
+}
 
