@@ -2,6 +2,7 @@ window.onload = function () {
     showTopicButtons();
 
     $(document).on("click", "#topicBtn", showImages)
+        .on("click", ".gif", animateImages)
 
 };
 
@@ -36,7 +37,9 @@ function showImages() {
             var cartoonImg = $("<img>");
             cartoonImg.attr("src", imgUrlStill);
             cartoonImg.attr("class", "gif");
-
+            cartoonImg.attr("data-still", imgUrlStill);
+            cartoonImg.attr("data-animate", imgUrlAnimate);
+            cartoonImg.attr("data-state", "still");
 
 
             var p = $("<p>").text("Rating: " + results[i].rating);
@@ -47,6 +50,21 @@ function showImages() {
 
     });
 }
+
+//https://www.omdbapi.com/?t=the+revenant&y=&plot=short&apikey=trilogy"
+
+function animateImages() {
+    var state = $(this).attr("data-state");
+    var still_image = $(this).attr("data-still");
+    var animated_image = $(this).attr("data-animate");
+    if (state == "still") {
+        $(this).attr("data-state", "animate");
+        $(this).attr("src", animated_image);
+    } else {
+        $(this).attr("data-state", "still");
+        $(this).attr("src", still_image);
+    }
+};
 
 
 
