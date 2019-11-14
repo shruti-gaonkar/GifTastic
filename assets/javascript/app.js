@@ -5,11 +5,14 @@ window.onload = function () {
         .on("click", ".gif", animateImages)
         .on("click", "#btnSubmit", addTopic)
         .on("click", "#movieBtn", showMovieImages)
-        .on("click", "#btnShowMore", showCartoonImages);
+        .on("click", "#btnShowMore", showCartoonImages)
+        .on("click", ".fab", addToFav);
 };
 
 var topicArr = [];
 var limit = 10;
+var imgObj = {};
+var favObj = {};
 
 var cartoonArr = ["captain planet", "disney", "finding nemo",
     "mickey mouse", "pink panther", "minions", "scooby doo", "teenage mutant ninja turtles", "tom and jerry",
@@ -50,14 +53,20 @@ function showCartoonImages() {
         method: "GET"
     }).then(function (response) {
         var results = response.data;
-        console.log(results);
+        // console.log(results);
         for (var i = 0; i < results.length; i++) {
             var imgUrlStill = results[i].images.fixed_height_still.url;
             var imgUrlAnimate = results[i].images.fixed_height.url;
 
+            var imgId = results[i].id;
+            var title = results[i].title.toUpperCase();
+            var rating = results[i].rating;
 
+            imgObj[imgId] = { title: title, rating: rating, imgUrlStill: imgUrlStill };
+
+            //console.log(imgObj);
             //console.log(results[i].title.toUpperCase());
-            var tDiv = $("<div>").html("Title: " + results[i].title.toUpperCase());
+            var tDiv = $("<div>").html("Title: " + title);
 
             var cartoonImg = $("<img>");
             cartoonImg.attr("src", imgUrlStill);
@@ -70,10 +79,12 @@ function showCartoonImages() {
             $(cDiv).append(cartoonImg);
             $(tDiv).append(cDiv);
 
-            var p1 = $("<p>").text("Rating: " + results[i].rating);
+            var p1 = $("<p>").text("Rating: " + rating);
 
             var cartoonDiv = $("<div>");
             $(cartoonDiv).append(tDiv).append(p1);
+
+            $(cartoonDiv).append($('<i data-id="' + imgId + '" data-cat="cartoon" class="fab fa-gratipay"></i>'));
             $("#images_div").prepend(cartoonDiv);
         }
         $("#images_div").prepend("<button id='btnShowMore' data-cartoon='" + cartoon + "'>Show more</button>");
@@ -130,3 +141,23 @@ function addTopic() {
     showTopicButtons();
 }
 
+function addToFav() {
+    var data_id = $(this).attr("data-id");
+    var category = $(this).attr("data-cat");
+    if (category = "cartoon") {
+        // Store all content into sessionStorage
+        favObj[data_id] = imgObj[data_id];
+        //console.log(favObj[data_id]);
+        sessionStorage.setItem("favList", JSON.stringify(favObj));
+    }
+
+    console.log(JSON.parse(sessionStorage.getItem("favList")));
+}
+
+var favList = JSON.parse(sessionStorage.getItem("favList"));
+
+if (!Array.isArray(favList)) {
+    favList = [];
+}
+
+console.log(JSON.parse(sessionStorage.getItem("favList")));
