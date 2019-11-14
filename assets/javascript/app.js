@@ -4,10 +4,12 @@ window.onload = function () {
     $(document).on("click", "#cartoonBtn", showCartoonImages)
         .on("click", ".gif", animateImages)
         .on("click", "#btnSubmit", addTopic)
-        .on("click", "#movieBtn", showMovieImages);
+        .on("click", "#movieBtn", showMovieImages)
+        .on("click", "#btnShowMore", showCartoonImages);
 };
 
 var topicArr = [];
+var limit = 10;
 
 var cartoonArr = ["captain planet", "disney", "finding nemo",
     "mickey mouse", "pink panther", "minions", "scooby doo", "teenage mutant ninja turtles", "tom and jerry",
@@ -33,19 +35,29 @@ function showTopicButtons() {
 }
 
 function showCartoonImages() {
+    $("#images_div").empty();
+
     var cartoon = $(this).attr("data-cat");
+    if ($(this).attr('data-cartoon')) {
+        limit += 10;
+        cartoon = $(this).attr('data-cartoon');
+    }
+
     var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
-        cartoon + "&api_key=zONFyrtr69ZHztB9A6XPdnsh7HPATTW5&limit=10";
+        cartoon + "&api_key=zONFyrtr69ZHztB9A6XPdnsh7HPATTW5&limit=" + limit;
     $.ajax({
         url: queryURL,
         method: "GET"
     }).then(function (response) {
         var results = response.data;
+        console.log(results);
         for (var i = 0; i < results.length; i++) {
             var imgUrlStill = results[i].images.fixed_height_still.url;
             var imgUrlAnimate = results[i].images.fixed_height.url;
-            console.log(results);
-            var cartoonDiv = $("<div>");
+
+
+            //console.log(results[i].title.toUpperCase());
+            var tDiv = $("<div>").html("Title: " + results[i].title.toUpperCase());
 
             var cartoonImg = $("<img>");
             cartoonImg.attr("src", imgUrlStill);
@@ -54,17 +66,22 @@ function showCartoonImages() {
             cartoonImg.attr("data-animate", imgUrlAnimate);
             cartoonImg.attr("data-state", "still");
 
+            var cDiv = $("<div>")
+            $(cDiv).append(cartoonImg);
+            $(tDiv).append(cDiv);
 
-            var p = $("<p>").text("Rating: " + results[i].rating);
-            $(cartoonDiv).append(cartoonImg);
-            $(cartoonDiv).append(p);
+            var p1 = $("<p>").text("Rating: " + results[i].rating);
+
+            var cartoonDiv = $("<div>");
+            $(cartoonDiv).append(tDiv).append(p1);
             $("#images_div").prepend(cartoonDiv);
         }
-
+        $("#images_div").prepend("<button id='btnShowMore' data-cartoon='" + cartoon + "'>Show more</button>");
     });
 }
 
 function showMovieImages() {
+    $("#images_div").empty();
     var movie = $(this).attr("data-cat");
     var queryURL = "https://www.omdbapi.com/?t=" + movie + "&apikey=29e7a54a";
     $.ajax({
