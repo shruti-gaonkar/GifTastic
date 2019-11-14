@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
 </head>
 
@@ -22,9 +23,17 @@
             </div>
 
             <div class="row">
-                <form>
+                <form id="frm">
                     <div class="form-group">
-                        <input type="text" class="form-control" id="cartoonNameId" placeholder="Add cartoon">
+                        <label for="nameId">Name</label>
+                        <input type="text" class="form-control" id="nameId">
+                        <div class="form-group">
+                            <label for="categoryId">Select category</label>
+                            <select class="form-control" id="categoryId">
+                                <option value="cartoon">Cartoon</option>
+                                <option value="movie">Movie</option>
+                            </select>
+                        </div>
                         <button id="btnSubmit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>

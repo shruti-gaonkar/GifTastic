@@ -1,26 +1,39 @@
 window.onload = function () {
     showTopicButtons();
 
-    $(document).on("click", "#topicBtn", showImages)
+    $(document).on("click", "#cartoonBtn", showCartoonImages)
         .on("click", ".gif", animateImages)
-        .on("click", "#btnSubmit", addTopic);
+        .on("click", "#btnSubmit", addTopic)
+        .on("click", "#movieBtn", showMovieImages);
 };
 
-var topicsArr = ["captain planet", "disney", "finding nemo",
+var topicArr = [];
+
+var cartoonArr = ["captain planet", "disney", "finding nemo",
     "mickey mouse", "pink panther", "minions", "scooby doo", "teenage mutant ninja turtles", "tom and jerry",
-    "the simpsons", "toy story", "wall e", "batman"];
+    "the simpsons", "toy story", "wall e"];
+
+var movieArr = ["batman", "inception"];
 
 function showTopicButtons() {
     $("#topic_div").empty();
-    $.each(topicsArr, function (i, val) {
-        var newBtn = $("<button id='topicBtn' class='btn btn-primary'>" + val + "</button>");
-        newBtn.attr("data-cartoon", val);
+    topicArr = [];
+    if ($("#categoryId").val() == "cartoon") {
+        topicArr = cartoonArr;
+        var btn = "cartoonBtn";
+    } else {
+        topicArr = movieArr;
+        var btn = "movieBtn";
+    }
+    $.each(topicArr, function (i, val) {
+        var newBtn = $("<button id='" + btn + "' class='btn btn-primary'>" + val + "</button>");
+        newBtn.attr("data-cat", val);
         $("#topic_div").append(newBtn);
     });
 }
 
-function showImages() {
-    var cartoon = $(this).attr("data-cartoon");
+function showCartoonImages() {
+    var cartoon = $(this).attr("data-cat");
     var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
         cartoon + "&api_key=zONFyrtr69ZHztB9A6XPdnsh7HPATTW5&limit=10";
     $.ajax({
@@ -51,7 +64,26 @@ function showImages() {
     });
 }
 
-//https://www.omdbapi.com/?t=the+revenant&y=&plot=short&apikey=trilogy"
+function showMovieImages() {
+    var movie = $(this).attr("data-cat");
+    var queryURL = "https://www.omdbapi.com/?t=" + movie + "&apikey=29e7a54a";
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+    }).then(function (response) {
+        console.log(response);
+        var movieDiv = $("<div>");
+        var p = $("<p>").html("<h1>" + response.Title + "</h1>" + response.Year + "<span>" + response.Actors + "</span");
+
+        var movieImg = $("<img>");
+        movieImg.attr("src", response.Poster);
+
+        movieDiv.append(movieImg).append(p);
+
+        $("#images_div").prepend(movieDiv);
+
+    });
+}
 
 function animateImages() {
     var state = $(this).attr("data-state");
@@ -68,9 +100,15 @@ function animateImages() {
 
 function addTopic() {
     event.preventDefault();
+    var first_name = $('#nameId').val();
+    if (first_name.length < 1) {
+        $('#nameId').after('<span class="error">This field is required</span>');
+    }
 
-    var cartoonName = $("#cartoonNameId").val();
-    if (!topicsArr.includes(cartoonName)) topicsArr.push(cartoonName);
+    var inputName = $("#nameId").val().trim();
+    var cat = $("#categoryId").val().trim();
+    if (!cartoonArr.includes(inputName) && cat == "cartoon") cartoonArr.push(inputName);
+    if (!movieArr.includes(inputName) && cat == "movie") movieArr.push(inputName);
 
     showTopicButtons();
 }
