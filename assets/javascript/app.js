@@ -12,7 +12,9 @@ window.onload = function () {
 var topicArr = [];
 var limit = 10;
 var imgObj = {};
+var imgMObj = {};
 var favObj = {};
+var favMObj = {};
 
 var cartoonArr = ["captain planet", "disney", "finding nemo",
     "mickey mouse", "pink panther", "minions", "scooby doo", "teenage mutant ninja turtles", "tom and jerry",
@@ -100,6 +102,13 @@ function showMovieImages() {
         method: "GET"
     }).then(function (response) {
         console.log(response);
+        var imgId = response.imdbID;
+        var title = response.Title;
+        var actors = response.Actors;
+        var release_year = response.Year;
+
+        imgMObj[imgId] = { title: title, actors: actors, release_year: release_year };
+        //console.log(imgMObj);
         var movieDiv = $("<div>");
         var p = $("<p>").html("<h1>" + response.Title + "</h1>" + response.Year + "<span>" + response.Actors + "</span");
 
@@ -107,6 +116,8 @@ function showMovieImages() {
         movieImg.attr("src", response.Poster);
 
         movieDiv.append(movieImg).append(p);
+
+        $(movieDiv).append($('<i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay"></i>'));
 
         $("#images_div").prepend(movieDiv);
 
@@ -144,20 +155,32 @@ function addTopic() {
 function addToFav() {
     var data_id = $(this).attr("data-id");
     var category = $(this).attr("data-cat");
-    if (category = "cartoon") {
+    //console.log(data_id + "=====" + category);
+    if (category == "cartoon") {
         // Store all content into sessionStorage
         favObj[data_id] = imgObj[data_id];
         //console.log(favObj[data_id]);
         sessionStorage.setItem("favList", JSON.stringify(favObj));
+    } else {
+        favMObj[data_id] = imgMObj[data_id];
+        //console.log(favMObj);
+        sessionStorage.setItem("favMList", JSON.stringify(favMObj));
     }
 
     console.log(JSON.parse(sessionStorage.getItem("favList")));
+    console.log(JSON.parse(sessionStorage.getItem("favMList")));
 }
 
 var favList = JSON.parse(sessionStorage.getItem("favList"));
+var favMList = JSON.parse(sessionStorage.getItem("favMList"));
 
 if (!Array.isArray(favList)) {
     favList = [];
 }
 
+if (!Array.isArray(favMList)) {
+    favMList = [];
+}
+
 console.log(JSON.parse(sessionStorage.getItem("favList")));
+console.log(JSON.parse(sessionStorage.getItem("favMList")));
