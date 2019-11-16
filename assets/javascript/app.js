@@ -20,7 +20,7 @@ var cartoonArr = ["captain planet", "disney", "finding nemo",
     "mickey mouse", "pink panther", "minions", "scooby doo", "teenage mutant ninja turtles", "tom and jerry",
     "the simpsons", "toy story", "wall e"];
 
-var movieArr = ["batman", "inception"];
+var movieArr = ["avengers", "inception", "black panther", "joker", "avatar", "the departed"];
 
 function showTopicButtons() {
     $("#topic_div").empty();
@@ -69,7 +69,6 @@ function showCartoonImages() {
 }
 
 function showMovieImages() {
-    $("#images_div").empty();
     var movie = $(this).attr("data-cat");
     var queryURL = "https://www.omdbapi.com/?t=" + movie + "&apikey=29e7a54a";
     $.ajax({
@@ -126,7 +125,7 @@ function renderImages(cat, response) {
         $(cDiv).append(cartoonImg);
         $(tDiv).append(cDiv);
 
-        var p1 = $("<div>").html('<div class="float-left"><strong>Rating:</strong> ' + rating + '</div><div class="float-right"><i data-id="' + imgId + '" data-cat="cartoon" class="fab fa-gratipay cursor-pointer"></i></div>');
+        var p1 = $("<div>").html('<div class="float-left"><strong>Rating:</strong> ' + rating + '</div><div class="float-right"><i data-id="' + imgId + '" data-cat="cartoon" class="fab fa-gratipay m-1 cursor-pointer"></i></div>');
 
         var cartoonDiv = $("<div class='view m-4'>");
         $(cartoonDiv).append(tDiv).append(p1);
@@ -139,6 +138,10 @@ function renderImages(cat, response) {
         var release_year = response.Year;
         var poster = response.Poster;
 
+        if (imgMObj[imgId]) {
+            return;
+        }
+
         imgMObj[imgId] = {
             Title: title,
             Actors: actors,
@@ -147,15 +150,27 @@ function renderImages(cat, response) {
             imdbID: imgId
         };
 
-        var movieDiv = $("<div>");
-        var p = $("<p>").html("<h1>" + title + "</h1>" + release_year + "<span>" + actors + "</span");
+        var tDiv = $("<div>").html("<h5>" + title + "(" + release_year + ")</h5>");
+
+        //var movieDiv = $("<div class='float-left w-25'>");
+        //var p = $("<p>").html("<h1>" + title + "</h1>" + release_year + "<span>" + actors + "</span");
 
         var movieImg = $("<img>");
         movieImg.attr("src", poster);
 
-        movieDiv.append(movieImg).append(p);
+        //movieDiv.append(movieImg).append(p);
 
-        $(movieDiv).append($('<i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay"></i>'));
+        var cDiv = $("<div>")
+        $(cDiv).append(movieImg);
+        $(tDiv).append(cDiv);
+
+        //var p1 = $("<div>").html('<div class="float-left w-50 text-center">' + actors + '(' + release_year + ')</div><div class="float-right"><i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay cursor-pointer"></i></div>');
+        var p1 = $("<div>").html('<div class="float-left">&nbsp;</div><div class="float-right"><i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay m-1 cursor-pointer"></i></div>');
+
+        var movieDiv = $("<div class='view m-4 w-25'>");
+        $(movieDiv).append(tDiv).append(p1);
+
+        //$(movieDiv).append($('<i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay"></i>'));
 
         $("#images_div").prepend(movieDiv);
     }
@@ -176,15 +191,17 @@ function animateImages() {
 
 function addTopic() {
     event.preventDefault();
-    var first_name = $('#nameId').val();
+    /*var first_name = $('#nameId').val();
     if (first_name.length < 1) {
         $('#nameId').after('<span class="error">This field is required</span>');
-    }
+    }*/
 
     var inputName = $("#nameId").val().trim();
-    var cat = $("#categoryId").val().trim();
-    if (!cartoonArr.includes(inputName) && cat == "cartoon") cartoonArr.push(inputName);
-    if (!movieArr.includes(inputName) && cat == "movie") movieArr.push(inputName);
+    if (inputName) {
+        var cat = $("#categoryId").val().trim();
+        if (!cartoonArr.includes(inputName) && cat == "cartoon") cartoonArr.push(inputName);
+        if (!movieArr.includes(inputName) && cat == "movie") movieArr.push(inputName);
+    }
 
     showTopicButtons();
 }
@@ -193,6 +210,7 @@ function addToFav() {
     var data_id = $(this).attr("data-id");
     var category = $(this).attr("data-cat");
     //console.log(data_id + "=====" + category);
+    $(this).toggleClass("heart");
     if (category == "cartoon") {
         // Store all content into sessionStorage
         favObj[data_id] = imgObj[data_id];
