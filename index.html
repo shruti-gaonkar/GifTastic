@@ -16,15 +16,28 @@
 
 <body class="d-flex flex-column">
     <main id="main-content">
-        <div class="container page-content mt-3 mb-5 text-center">
+        <div class="container-fluid">
             <div class="row">
-                <div class="col-12">
-                    <h1>GifTastic</h1>
-                </div>
-            </div>
-
-            <div class="row">
-                <form id="frm">
+                <form id="frm" class="m-auto">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="categoryId">&nbsp;</label>
+                            <select id="categoryId" class="form-control">
+                                <option value="cartoon" selected>Cartoon</option>
+                                <option value="movie">Movie</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="nameId">&nbsp;</label>
+                            <input type="email" class="form-control" id="nameId" placeholder="Name">
+                        </div>
+                        <div class="col-md-2">
+                            <label>&nbsp;</label>
+                            <button id="btnSubmit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </form>
+                <!--form id="frm">
                     <div class="form-group">
                         <label for="nameId">Name</label>
                         <input type="text" class="form-control" id="nameId">
@@ -37,7 +50,7 @@
                         </div>
                         <button id="btnSubmit" class="btn btn-primary">Submit</button>
                     </div>
-                </form>
+                </form-->
             </div>
 
             <!-- Topic Div-->

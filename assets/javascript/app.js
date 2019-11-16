@@ -33,9 +33,12 @@ function showTopicButtons() {
         var btn = "movieBtn";
     }
     $.each(topicArr, function (i, val) {
-        var newBtn = $("<button id='" + btn + "' class='btn btn-primary'>" + val + "</button>");
+        var newDiv = $("<div class='float-left p-1'>");
+        var newBtn = $("<button id='" + btn + "' class='btn btn-info'>" + val + "</button>");
         newBtn.attr("data-cat", val);
-        $("#topic_div").append(newBtn);
+        $(newDiv).append(newBtn);
+
+        $("#topic_div").append(newDiv);
     });
 }
 
@@ -55,41 +58,13 @@ function showCartoonImages() {
         method: "GET"
     }).then(function (response) {
         var results = response.data;
-        // console.log(results);
+        console.log(results);
         for (var i = 0; i < results.length; i++) {
-            var imgUrlStill = results[i].images.fixed_height_still.url;
-            var imgUrlAnimate = results[i].images.fixed_height.url;
-
-            var imgId = results[i].id;
-            var title = results[i].title.toUpperCase();
-            var rating = results[i].rating;
-
-            imgObj[imgId] = { title: title, rating: rating, imgUrlStill: imgUrlStill };
-
             //console.log(imgObj);
             //console.log(results[i].title.toUpperCase());
-            var tDiv = $("<div>").html("Title: " + title);
-
-            var cartoonImg = $("<img>");
-            cartoonImg.attr("src", imgUrlStill);
-            cartoonImg.attr("class", "gif");
-            cartoonImg.attr("data-still", imgUrlStill);
-            cartoonImg.attr("data-animate", imgUrlAnimate);
-            cartoonImg.attr("data-state", "still");
-
-            var cDiv = $("<div>")
-            $(cDiv).append(cartoonImg);
-            $(tDiv).append(cDiv);
-
-            var p1 = $("<p>").text("Rating: " + rating);
-
-            var cartoonDiv = $("<div>");
-            $(cartoonDiv).append(tDiv).append(p1);
-
-            $(cartoonDiv).append($('<i data-id="' + imgId + '" data-cat="cartoon" class="fab fa-gratipay"></i>'));
-            $("#images_div").prepend(cartoonDiv);
+            renderImages("cartoon", results[i]);
         }
-        $("#images_div").prepend("<button id='btnShowMore' data-cartoon='" + cartoon + "'>Show more</button>");
+        //$("#images_div").prepend("<button id='btnShowMore' data-cartoon='" + cartoon + "'>Show more</button>");
     });
 }
 
@@ -101,27 +76,89 @@ function showMovieImages() {
         url: queryURL,
         method: "GET"
     }).then(function (response) {
-        console.log(response);
+        //console.log(response);
+        //console.log(imgMObj);
+
+        renderImages("movie", response);
+    });
+}
+
+
+function renderImages(cat, response) {
+    if (cat == "cartoon") {
+        var imgId = response.id;
+        var title = response.title.toUpperCase();
+        var rating = response.rating;
+        var imgUrlStill = response.images.fixed_height_still.url;
+        var imgWidthStill = response.images.fixed_height_still.width;
+        var imgHeightStill = response.images.fixed_height_still.height;
+        var imgUrlAnimate = response.images.fixed_height.url;
+
+        imgObj[imgId] = {
+            id: imgId,
+            title: title,
+            rating: rating,
+            images: {
+                fixed_height_still:
+                {
+                    url: imgUrlStill,
+                    width: imgWidthStill,
+                    height: imgHeightStill
+                },
+                fixed_height:
+                {
+                    url: imgUrlAnimate
+                }
+            }
+        };
+
+        var tDiv = $("<div>").html("<h6>" + truncate(title, 5) + "</h6>");
+
+        var cartoonImg = $("<img>");
+        cartoonImg.attr("src", imgUrlStill);
+        cartoonImg.attr("class", "gif");
+        cartoonImg.attr("style", "width:" + imgWidthStill + "px;height: " + imgHeightStill + ";");
+        cartoonImg.attr("data-still", imgUrlStill);
+        cartoonImg.attr("data-animate", imgUrlAnimate);
+        cartoonImg.attr("data-state", "still");
+
+        var cDiv = $("<div>")
+        $(cDiv).append(cartoonImg);
+        $(tDiv).append(cDiv);
+
+        var p1 = $("<div>").html('<div class="float-left"><strong>Rating:</strong> ' + rating + '</div><div class="float-right"><i data-id="' + imgId + '" data-cat="cartoon" class="fab fa-gratipay cursor-pointer"></i></div>');
+
+        var cartoonDiv = $("<div class='view m-4'>");
+        $(cartoonDiv).append(tDiv).append(p1);
+
+        $("#images_div").prepend(cartoonDiv);
+    } else {
         var imgId = response.imdbID;
         var title = response.Title;
         var actors = response.Actors;
         var release_year = response.Year;
+        var poster = response.Poster;
 
-        imgMObj[imgId] = { title: title, actors: actors, release_year: release_year };
-        //console.log(imgMObj);
+        imgMObj[imgId] = {
+            Title: title,
+            Actors: actors,
+            Year: release_year,
+            Poster: poster,
+            imdbID: imgId
+        };
+
         var movieDiv = $("<div>");
-        var p = $("<p>").html("<h1>" + response.Title + "</h1>" + response.Year + "<span>" + response.Actors + "</span");
+        var p = $("<p>").html("<h1>" + title + "</h1>" + release_year + "<span>" + actors + "</span");
 
         var movieImg = $("<img>");
-        movieImg.attr("src", response.Poster);
+        movieImg.attr("src", poster);
 
         movieDiv.append(movieImg).append(p);
 
         $(movieDiv).append($('<i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay"></i>'));
 
         $("#images_div").prepend(movieDiv);
-
-    });
+    }
 }
 
 function animateImages() {
@@ -159,16 +196,20 @@ function addToFav() {
     if (category == "cartoon") {
         // Store all content into sessionStorage
         favObj[data_id] = imgObj[data_id];
-        //console.log(favObj[data_id]);
+        console.log(favObj);
         sessionStorage.setItem("favList", JSON.stringify(favObj));
     } else {
         favMObj[data_id] = imgMObj[data_id];
-        //console.log(favMObj);
+        console.log(favMObj);
         sessionStorage.setItem("favMList", JSON.stringify(favMObj));
     }
 
-    console.log(JSON.parse(sessionStorage.getItem("favList")));
-    console.log(JSON.parse(sessionStorage.getItem("favMList")));
+    //console.log(JSON.parse(sessionStorage.getItem("favList")));
+    //console.log(JSON.parse(sessionStorage.getItem("favMList")));
+}
+
+function truncate(str, no_words) {
+    return str.split(" ").splice(0, no_words).join(" ");
 }
 
 var favList = JSON.parse(sessionStorage.getItem("favList"));
