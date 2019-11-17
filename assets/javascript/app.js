@@ -6,7 +6,8 @@ window.onload = function () {
         .on("click", "#btnSubmit", addTopic)
         .on("click", "#movieBtn", showMovieImages)
         .on("click", "#btnShowMore", showCartoonImages)
-        .on("click", ".fab", addToFav);
+        .on("click", ".fab", addToFav)
+        .on("click", "#btnFav", showFavs);
 };
 
 var topicArr = [];
@@ -58,13 +59,10 @@ function showCartoonImages() {
         method: "GET"
     }).then(function (response) {
         var results = response.data;
-        console.log(results);
         for (var i = 0; i < results.length; i++) {
-            //console.log(imgObj);
-            //console.log(results[i].title.toUpperCase());
             renderImages("cartoon", results[i]);
         }
-        //$("#images_div").prepend("<button id='btnShowMore' data-cartoon='" + cartoon + "'>Show more</button>");
+        // $("#images_div").prepend("<button id='btnShowMore' class='btn btn-warning' data-cartoon='" + cartoon + "'>Show more</button>");
     });
 }
 
@@ -165,14 +163,11 @@ function renderImages(cat, response) {
         $(cDiv).append(movieImg);
         $(tDiv).append(cDiv);
 
-        //var p1 = $("<div>").html('<div class="float-left w-50 text-center">' + actors + '(' + release_year + ')</div><div class="float-right"><i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay cursor-pointer"></i></div>');
         if (favMList[imgId]) var favClass = "heart";
         var p1 = $("<div>").html('<div class="float-left">&nbsp;</div><div class="float-right"><i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay ' + favClass + ' m-1 cursor-pointer"></i></div>');
 
         var movieDiv = $("<div class='view m-4 w-25'>");
         $(movieDiv).append(tDiv).append(p1);
-
-        //$(movieDiv).append($('<i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay"></i>'));
 
         $("#images_div").prepend(movieDiv);
     }
@@ -197,10 +192,6 @@ function addTopic() {
     event.preventDefault();
 
     $("#images_div").empty();
-    /*var first_name = $('#nameId').val();
-    if (first_name.length < 1) {
-        $('#nameId').after('<span class="error">This field is required</span>');
-    }*/
 
     var inputName = $("#nameId").val().trim();
     if (inputName) {
@@ -215,7 +206,7 @@ function addTopic() {
 function addToFav() {
     var data_id = $(this).attr("data-id");
     var category = $(this).attr("data-cat");
-    //console.log(data_id + "=====" + category);
+
     $(this).toggleClass("heart");
     if (category == "cartoon") {
         // Store all content into sessionStorage
@@ -226,8 +217,8 @@ function addToFav() {
         } else {
             delete favObj[data_id];
         }
-        console.log(favObj);
         sessionStorage.setItem("favList", JSON.stringify(favObj));
+        favList = JSON.parse(sessionStorage.getItem("favList"));
     } else {
         favMObj = JSON.parse(sessionStorage.getItem("favMList"));
         if (!favMObj) favMObj = {};
@@ -236,22 +227,32 @@ function addToFav() {
         } else {
             delete favMObj[data_id];
         }
-        console.log(favMObj);
         sessionStorage.setItem("favMList", JSON.stringify(favMObj));
+        favMList = JSON.parse(sessionStorage.getItem("favMList"));
     }
-
-    //console.log(JSON.parse(sessionStorage.getItem("favList")));
-    //console.log(JSON.parse(sessionStorage.getItem("favMList")));
 }
 
 function truncate(str, no_words) {
     return str.split(" ").splice(0, no_words).join(" ");
 }
 
+function showFavs() {
+    event.preventDefault();
+    $("#topic_div").empty();
+    $("#images_div").empty();
+    for (var key in favList) {
+        console.log(key);
+        renderImages("cartoon", favList[key]);
+    }
+
+    for (var key in favMList) {
+        console.log(key);
+        renderImages("movies", favMList[key]);
+    }
+}
+
 var favList = JSON.parse(sessionStorage.getItem("favList"));
 var favMList = JSON.parse(sessionStorage.getItem("favMList"));
-
-//console.log(favList);
 
 if (!favList) {
     favList = {};
@@ -260,6 +261,3 @@ if (!favList) {
 if (!favMList) {
     favMList = {};
 }
-
-console.log(favList);
-console.log(favMList);
