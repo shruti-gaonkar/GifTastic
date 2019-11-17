@@ -73,15 +73,12 @@ function showMovieImages() {
         url: queryURL,
         method: "GET"
     }).then(function (response) {
-        //console.log(response);
-        //console.log(imgMObj);
-
         renderImages("movie", response);
     });
 }
 
 
-function renderImages(cat, response) {
+function renderImages(cat, response, favPage = false) {
     if (cat == "cartoon") {
         var imgId = response.id;
         var title = response.title.toUpperCase();
@@ -131,15 +128,12 @@ function renderImages(cat, response) {
 
         $("#images_div").prepend(cartoonDiv);
     } else {
+        //console.log(response);
         var imgId = response.imdbID;
         var title = response.Title;
         var actors = response.Actors;
         var release_year = response.Year;
         var poster = response.Poster;
-
-        if (imgMObj[imgId]) {
-            return;
-        }
 
         imgMObj[imgId] = {
             Title: title,
@@ -150,14 +144,8 @@ function renderImages(cat, response) {
         };
 
         var tDiv = $("<div>").html("<h5>" + title + "(" + release_year + ")</h5>");
-
-        //var movieDiv = $("<div class='float-left w-25'>");
-        //var p = $("<p>").html("<h1>" + title + "</h1>" + release_year + "<span>" + actors + "</span");
-
         var movieImg = $("<img>");
         movieImg.attr("src", poster);
-
-        //movieDiv.append(movieImg).append(p);
 
         var cDiv = $("<div>")
         $(cDiv).append(movieImg);
@@ -169,7 +157,8 @@ function renderImages(cat, response) {
         var movieDiv = $("<div class='view m-4 w-25'>");
         $(movieDiv).append(tDiv).append(p1);
 
-        $("#images_div").prepend(movieDiv);
+        var divToAppend = (favPage) ? "#topic_div" : "#images_div";
+        $(divToAppend).prepend(movieDiv);
     }
 }
 
@@ -198,6 +187,7 @@ function addTopic() {
         var cat = $("#categoryId").val().trim();
         if (!cartoonArr.includes(inputName) && cat == "cartoon") cartoonArr.push(inputName);
         if (!movieArr.includes(inputName) && cat == "movie") movieArr.push(inputName);
+        $("#nameId").val('');
     }
 
     showTopicButtons();
@@ -240,15 +230,25 @@ function showFavs() {
     event.preventDefault();
     $("#topic_div").empty();
     $("#images_div").empty();
+
+    if (Object.entries(favList).length == 0 && Object.entries(favMList).length == 0) {
+
+        $("#images_div").html('<div class="alert alert-danger text-center" role="alert">Oops! You don\'t have any favourites added.</div>');
+        return;
+    }
     for (var key in favList) {
-        console.log(key);
         renderImages("cartoon", favList[key]);
     }
 
+    if (Object.entries(favList).length > 0)
+        $("#images_div").prepend('<div class="p-3 mb-2 bg-secondary text-white text-center">Favourite Cartoons</div>');
+
     for (var key in favMList) {
-        console.log(key);
-        renderImages("movies", favMList[key]);
+        renderImages("movie", favMList[key], true);
     }
+
+    if (Object.entries(favMList).length > 0)
+        $("#topic_div").prepend('<div class="p-3 mb-2 bg-secondary text-white text-center">Favourite Movies</div>');
 }
 
 var favList = JSON.parse(sessionStorage.getItem("favList"));
