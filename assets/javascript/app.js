@@ -1,6 +1,8 @@
 window.onload = function () {
+    // show all topic buttons
     showTopicButtons();
 
+    // initialise all the click events for all buttons
     $(document).on("click", "#cartoonBtn", showCartoonImages)
         .on("click", ".gif", animateImages)
         .on("click", "#btnSubmit", addTopic)
@@ -10,19 +12,28 @@ window.onload = function () {
         .on("click", "#btnFav", showFavs);
 };
 
+// initialising global variables
 var topicArr = [];
 var limit = 10;
+
+// stores all the cartoons and movies shown on page to use it for favourite section
 var imgObj = {};
 var imgMObj = {};
+
+// stores session variables for favourite cartoon and movies
 var favObj = {};
 var favMObj = {};
 
+// iniatialise the topics for the cartoons and movies
 var cartoonArr = ["captain planet", "disney", "finding nemo",
     "mickey mouse", "pink panther", "minions", "scooby doo", "teenage mutant ninja turtles", "tom and jerry",
     "the simpsons", "toy story", "wall e"];
 
 var movieArr = ["avengers", "inception", "black panther", "joker", "avatar", "the departed"];
 
+/**
+ * function to show the topic buttons for cartoon and movies
+ */
 function showTopicButtons() {
     $("#topic_div").empty();
     topicArr = [];
@@ -33,6 +44,8 @@ function showTopicButtons() {
         topicArr = movieArr;
         var btn = "movieBtn";
     }
+
+    // loop through the array to show the topic buttons
     $.each(topicArr, function (i, val) {
         var newDiv = $("<div class='float-left p-1'>");
         var newBtn = $("<button id='" + btn + "' class='btn btn-info'>" + val + "</button>");
@@ -43,6 +56,10 @@ function showTopicButtons() {
     });
 }
 
+
+/**
+ * function to fetch the cartoon images by connecting to the Giphy API
+ */
 function showCartoonImages() {
     $("#images_div").empty();
 
@@ -62,10 +79,15 @@ function showCartoonImages() {
         for (var i = 0; i < results.length; i++) {
             renderImages("cartoon", results[i]);
         }
+
+        // shows the Show More button
         $("#images_div").prepend("<div class='float-right'><button id='btnShowMore' class='btn btn-warning' data-cartoon='" + cartoon + "'>Show more</button></div>");
     });
 }
 
+/**
+ * function to show movies by connecting to the OMDB API
+ */
 function showMovieImages() {
     var movie = $(this).attr("data-cat");
     var queryURL = "https://www.omdbapi.com/?t=" + movie + "&apikey=29e7a54a";
@@ -78,6 +100,12 @@ function showMovieImages() {
 }
 
 
+/**
+ * 
+ * @param {string} cat : to check if it is cartoon or movie to display
+ * @param {object} response : details to show in html
+ * @param {boolean} favPage : to check if the section to be displayed is my favourites section
+ */
 function renderImages(cat, response, favPage = false) {
     if (cat == "cartoon") {
         var imgId = response.id;
@@ -88,6 +116,7 @@ function renderImages(cat, response, favPage = false) {
         var imgHeightStill = response.images.fixed_height_still.height;
         var imgUrlAnimate = response.images.fixed_height.url;
 
+        // store the data in imgObj object to use for favourite section
         imgObj[imgId] = {
             id: imgId,
             title: title,
@@ -106,8 +135,10 @@ function renderImages(cat, response, favPage = false) {
             }
         };
 
+        // display the title for giphy cartoon images
         var tDiv = $("<div>").html("<h6>" + truncate(title, 5) + "</h6>");
 
+        // display the giphy cartoon images
         var cartoonImg = $("<img>");
         cartoonImg.attr("src", imgUrlStill);
         cartoonImg.attr("class", "gif");
@@ -120,7 +151,10 @@ function renderImages(cat, response, favPage = false) {
         $(cDiv).append(cartoonImg);
         $(tDiv).append(cDiv);
 
+        // to assign red heart class if the image is selected as a favourite
         if (favList[imgId]) var favClass = "heart";
+
+        // to show rating and grey heart image to add to favs
         var p1 = $("<div>").html('<div class="float-left"><strong>Rating:</strong> ' + rating + '</div><div class="float-right"><i data-id="' + imgId + '" data-cat="cartoon" class="fab fa-gratipay ' + favClass + ' m-1 cursor-pointer"></i></div>');
 
         var cartoonDiv = $("<div class='view m-4'>");
@@ -128,13 +162,13 @@ function renderImages(cat, response, favPage = false) {
 
         $("#images_div").prepend(cartoonDiv);
     } else {
-        //console.log(response);
         var imgId = response.imdbID;
         var title = response.Title;
         var actors = response.Actors;
         var release_year = response.Year;
         var poster = response.Poster;
 
+        // store the movies data in imgMObj object to use for favourite section
         imgMObj[imgId] = {
             Title: title,
             Actors: actors,
@@ -143,6 +177,7 @@ function renderImages(cat, response, favPage = false) {
             imdbID: imgId
         };
 
+        // to show title and release date
         var tDiv = $("<div>").html("<h5>" + title + "(" + release_year + ")</h5>");
         var movieImg = $("<img>");
         movieImg.attr("src", poster);
@@ -151,19 +186,25 @@ function renderImages(cat, response, favPage = false) {
         $(cDiv).append(movieImg);
         $(tDiv).append(cDiv);
 
+        // to assign red heart class if the image is selected as a favourite
         if (favMList[imgId]) var favClass = "heart";
+
+        // to show rating and grey heart image to add to favs
         var p1 = $("<div>").html('<div class="float-left">&nbsp;</div><div class="float-right"><i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay ' + favClass + ' m-1 cursor-pointer"></i></div>');
 
+        // append details to a new div
         var movieDiv = $("<div class='view m-4 w-25'>");
         $(movieDiv).append(tDiv).append(p1);
 
+        // if fav section then append details in topic_div else image_div
         var divToAppend = (favPage) ? "#topic_div" : "#images_div";
         $(divToAppend).prepend(movieDiv);
     }
 }
 
-
-
+/**
+ * function to animate the still images
+ */
 function animateImages() {
     var state = $(this).attr("data-state");
     var still_image = $(this).attr("data-still");
@@ -177,6 +218,9 @@ function animateImages() {
     }
 };
 
+/**
+ * function to add a topic and show in the topics section
+ */
 function addTopic() {
     event.preventDefault();
 
@@ -185,72 +229,104 @@ function addTopic() {
     var inputName = $("#nameId").val().trim();
     if (inputName) {
         var cat = $("#categoryId").val().trim();
+        // push the new added topic to cartoon or movie array based on the category selected
         if (!cartoonArr.includes(inputName) && cat == "cartoon") cartoonArr.push(inputName);
         if (!movieArr.includes(inputName) && cat == "movie") movieArr.push(inputName);
         $("#nameId").val('');
     }
 
+    // show all topic buttons
     showTopicButtons();
 }
 
+/**
+ * Function to add to favourites
+ */
 function addToFav() {
     var data_id = $(this).attr("data-id");
     var category = $(this).attr("data-cat");
 
+    // toggle the heart image if added to fav or removed from fav
     $(this).toggleClass("heart");
     if (category == "cartoon") {
-        // Store all content into sessionStorage
+        // Get all content from sessionStorage
         favObj = JSON.parse(sessionStorage.getItem("favList"));
         if (!favObj) favObj = {};
         if ($(this).hasClass("heart")) {
+            // if added to fav, update the favourite temp session array
             favObj[data_id] = imgObj[data_id];
         } else {
+            // if removed from fav, remove from the favourite temp session array
             delete favObj[data_id];
         }
+        // update the session fav list based on the temp session array
         sessionStorage.setItem("favList", JSON.stringify(favObj));
+
+        // get the session array and store in favList
         favList = JSON.parse(sessionStorage.getItem("favList"));
     } else {
+        // Get all movie content from sessionStorage
         favMObj = JSON.parse(sessionStorage.getItem("favMList"));
         if (!favMObj) favMObj = {};
         if ($(this).hasClass("heart")) {
+            // if added to fav, update the favourite temp session array
             favMObj[data_id] = imgMObj[data_id];
         } else {
+            // if removed from fav, remove from the favourite temp session array
             delete favMObj[data_id];
         }
+        // update the session fav list based on the temp session array
         sessionStorage.setItem("favMList", JSON.stringify(favMObj));
+
+        // get the session array and store in favMList
         favMList = JSON.parse(sessionStorage.getItem("favMList"));
     }
 }
 
+/**
+ * function to truncate the words in a string
+ * @param {string} str : the string to truncate
+ * @param {number} no_words : number of words to truncate
+ */
 function truncate(str, no_words) {
     return str.split(" ").splice(0, no_words).join(" ");
 }
 
+/**
+ * function to show the favourite images my calling renderImages function
+ */
 function showFavs() {
     event.preventDefault();
     $("#topic_div").empty();
     $("#images_div").empty();
 
+    // if no fav images show no images message
     if (Object.entries(favList).length == 0 && Object.entries(favMList).length == 0) {
 
         $("#images_div").html('<div class="alert alert-danger text-center" role="alert">Oops! You don\'t have any favourites added.</div>');
         return;
     }
+
+    // display the cartoon images
     for (var key in favList) {
         renderImages("cartoon", favList[key]);
     }
 
+    // to show the heading for fav cartoon
     if (Object.entries(favList).length > 0)
         $("#images_div").prepend('<div class="p-3 mb-2 bg-secondary text-white text-center">Favourite Cartoons</div>');
 
+    // display the movie images
     for (var key in favMList) {
         renderImages("movie", favMList[key], true);
     }
 
+    // to show the heading for fav movies
     if (Object.entries(favMList).length > 0)
         $("#topic_div").prepend('<div class="p-3 mb-2 bg-secondary text-white text-center">Favourite Movies</div>');
 }
 
+// on load of page, populate the arrays with session variables
 var favList = JSON.parse(sessionStorage.getItem("favList"));
 var favMList = JSON.parse(sessionStorage.getItem("favMList"));
 
