@@ -193,7 +193,7 @@ function renderImages(cat, response, favPage = false) {
         var p1 = $("<div>").html('<div class="float-left">&nbsp;</div><div class="float-right"><i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay ' + favClass + ' m-1 cursor-pointer"></i></div>');
 
         // append details to a new div
-        var movieDiv = $("<div class='view m-4 w-25'>");
+        var movieDiv = $("<div class='view m-4'>");
         $(movieDiv).append(tDiv).append(p1);
 
         // if fav section then append details in topic_div else image_div
