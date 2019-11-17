@@ -54,6 +54,8 @@ function showTopicButtons() {
 
         $("#topic_div").append(newDiv);
     });
+
+    $("#topic_div").prepend("<div class='p-2 bg-secondary text-white'><h6>Category: " + $("#categoryId").val().toUpperCase() + "</h6></div>");
 }
 
 
@@ -80,8 +82,8 @@ function showCartoonImages() {
             renderImages("cartoon", results[i]);
         }
 
-        // shows the Show More button
-        $("#images_div").prepend("<div class='float-right'><button id='btnShowMore' class='btn btn-warning' data-cartoon='" + cartoon + "'>Show more</button></div>");
+        // shows the Category on the page and Show More button
+        $("#images_div").prepend("<div class='p-2 bg-secondary text-white overflow-hidden'><div class='float-left'><h3>Cartoons</h3></div><div class='float-right'><button id='btnShowMore' class='btn btn-warning' data-cartoon='" + cartoon + "'>Show more</button></div></div>");
     });
 }
 
@@ -314,7 +316,7 @@ function showFavs() {
 
     // to show the heading for fav cartoon
     if (Object.entries(favList).length > 0)
-        $("#images_div").prepend('<div class="p-3 mb-2 bg-secondary text-white text-center">Favourite Cartoons</div>');
+        $("#images_div").prepend('<div class="p-3 mb-2 bg-secondary text-white text-center"><h5>Favourite Cartoons</h5></div>');
 
     // display the movie images
     for (var key in favMList) {
@@ -323,7 +325,7 @@ function showFavs() {
 
     // to show the heading for fav movies
     if (Object.entries(favMList).length > 0)
-        $("#topic_div").prepend('<div class="p-3 mb-2 bg-secondary text-white text-center">Favourite Movies</div>');
+        $("#topic_div").prepend('<div class="p-3 mb-2 bg-secondary text-white text-center"><h5>Favourite Movies</h5></div>');
 }
 
 // on load of page, populate the arrays with session variables
