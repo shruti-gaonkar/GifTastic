@@ -125,7 +125,8 @@ function renderImages(cat, response) {
         $(cDiv).append(cartoonImg);
         $(tDiv).append(cDiv);
 
-        var p1 = $("<div>").html('<div class="float-left"><strong>Rating:</strong> ' + rating + '</div><div class="float-right"><i data-id="' + imgId + '" data-cat="cartoon" class="fab fa-gratipay m-1 cursor-pointer"></i></div>');
+        if (favList[imgId]) var favClass = "heart";
+        var p1 = $("<div>").html('<div class="float-left"><strong>Rating:</strong> ' + rating + '</div><div class="float-right"><i data-id="' + imgId + '" data-cat="cartoon" class="fab fa-gratipay ' + favClass + ' m-1 cursor-pointer"></i></div>');
 
         var cartoonDiv = $("<div class='view m-4'>");
         $(cartoonDiv).append(tDiv).append(p1);
@@ -165,7 +166,8 @@ function renderImages(cat, response) {
         $(tDiv).append(cDiv);
 
         //var p1 = $("<div>").html('<div class="float-left w-50 text-center">' + actors + '(' + release_year + ')</div><div class="float-right"><i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay cursor-pointer"></i></div>');
-        var p1 = $("<div>").html('<div class="float-left">&nbsp;</div><div class="float-right"><i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay m-1 cursor-pointer"></i></div>');
+        if (favMList[imgId]) var favClass = "heart";
+        var p1 = $("<div>").html('<div class="float-left">&nbsp;</div><div class="float-right"><i data-id="' + imgId + '" data-cat="movie" class="fab fa-gratipay ' + favClass + ' m-1 cursor-pointer"></i></div>');
 
         var movieDiv = $("<div class='view m-4 w-25'>");
         $(movieDiv).append(tDiv).append(p1);
@@ -175,6 +177,8 @@ function renderImages(cat, response) {
         $("#images_div").prepend(movieDiv);
     }
 }
+
+
 
 function animateImages() {
     var state = $(this).attr("data-state");
@@ -191,6 +195,8 @@ function animateImages() {
 
 function addTopic() {
     event.preventDefault();
+
+    $("#images_div").empty();
     /*var first_name = $('#nameId').val();
     if (first_name.length < 1) {
         $('#nameId').after('<span class="error">This field is required</span>');
@@ -213,11 +219,23 @@ function addToFav() {
     $(this).toggleClass("heart");
     if (category == "cartoon") {
         // Store all content into sessionStorage
-        favObj[data_id] = imgObj[data_id];
+        favObj = JSON.parse(sessionStorage.getItem("favList"));
+        if (!favObj) favObj = {};
+        if ($(this).hasClass("heart")) {
+            favObj[data_id] = imgObj[data_id];
+        } else {
+            delete favObj[data_id];
+        }
         console.log(favObj);
         sessionStorage.setItem("favList", JSON.stringify(favObj));
     } else {
-        favMObj[data_id] = imgMObj[data_id];
+        favMObj = JSON.parse(sessionStorage.getItem("favMList"));
+        if (!favMObj) favMObj = {};
+        if ($(this).hasClass("heart")) {
+            favMObj[data_id] = imgMObj[data_id];
+        } else {
+            delete favMObj[data_id];
+        }
         console.log(favMObj);
         sessionStorage.setItem("favMList", JSON.stringify(favMObj));
     }
@@ -233,13 +251,15 @@ function truncate(str, no_words) {
 var favList = JSON.parse(sessionStorage.getItem("favList"));
 var favMList = JSON.parse(sessionStorage.getItem("favMList"));
 
-if (!Array.isArray(favList)) {
-    favList = [];
+//console.log(favList);
+
+if (!favList) {
+    favList = {};
 }
 
-if (!Array.isArray(favMList)) {
-    favMList = [];
+if (!favMList) {
+    favMList = {};
 }
 
-console.log(JSON.parse(sessionStorage.getItem("favList")));
-console.log(JSON.parse(sessionStorage.getItem("favMList")));
+console.log(favList);
+console.log(favMList);
