@@ -62,7 +62,7 @@ function showCartoonImages() {
         for (var i = 0; i < results.length; i++) {
             renderImages("cartoon", results[i]);
         }
-        // $("#images_div").prepend("<button id='btnShowMore' class='btn btn-warning' data-cartoon='" + cartoon + "'>Show more</button>");
+        $("#images_div").prepend("<div class='float-right'><button id='btnShowMore' class='btn btn-warning' data-cartoon='" + cartoon + "'>Show more</button></div>");
     });
 }
 
