@@ -97,6 +97,10 @@ function showMovieImages() {
         url: queryURL,
         method: "GET"
     }).then(function (response) {
+        if (response.Response.toLowerCase() == "false") {
+            alert("Movie not found!");
+            return;
+        }
         renderImages("movie", response);
     });
 }
@@ -169,6 +173,10 @@ function renderImages(cat, response, favPage = false) {
         var actors = response.Actors;
         var release_year = response.Year;
         var poster = response.Poster;
+
+        /*if (!favPage) {
+            if (imgMObj[imgId]) return;
+        }*/
 
         // store the movies data in imgMObj object to use for favourite section
         imgMObj[imgId] = {
