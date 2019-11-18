@@ -174,9 +174,9 @@ function renderImages(cat, response, favPage = false) {
         var release_year = response.Year;
         var poster = response.Poster;
 
-        /*if (!favPage) {
+        if (!favPage) {
             if (imgMObj[imgId]) return;
-        }*/
+        }
 
         // store the movies data in imgMObj object to use for favourite section
         imgMObj[imgId] = {
@@ -234,6 +234,9 @@ function animateImages() {
 function addTopic() {
     event.preventDefault();
 
+    // clear the temp arrays when submit button is clicked to add topics or change category
+    imgObj = [];
+    imgMObj = [];
     $("#images_div").empty();
 
     var inputName = $("#nameId").val().trim();
